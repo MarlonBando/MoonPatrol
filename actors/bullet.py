@@ -1,11 +1,7 @@
 from .actor import Actor
 from .actor import Arena
 from .hole import Hole
-from .alien import Alien
-from .hero import Hero
 from config.const import *
-
-import random
 
 class Bullet(Actor):
     def __init__(self, arena:Arena,pos:(int,int),dx:int,dy:int,hero=None):
@@ -44,18 +40,14 @@ class Bullet(Actor):
 
     def _handle_explosion(self):
         if self._i_explosion >= len(self._explosion):
-            self._maybe_spawn_hole()
+            self.spawn_hole()
             self._arena.remove(self)
 
-    def _maybe_spawn_hole(self):
-        if self._dy > 0 and self._y >= BULLET_GROUND_Y_THRESHOLD and random.randrange(BULLET_HOLE_SPAWN_CHANCE) == BULLET_HOLE_SPAWN_THRESHOLD:
+    def spawn_hole(self):
+        if self._dy > 0 and self._y >= BULLET_GROUND_Y_THRESHOLD:
             self._arena.add(Hole(FLOOR, self._x - BULLET_HOLE_X_OFFSET, FLOOR_SPEED, self._arena))
 
     def collide(self, other):
-        if isinstance(other, (Hero, Alien)):
-            self._arena.remove(self)
-            return
-
         if isinstance(other, Bullet) and self._is_same_direction(other):
             return
 
